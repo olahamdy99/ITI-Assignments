@@ -1,0 +1,78 @@
+1)
+- cd /etc/httpd
+- ls
+  conf  conf.d  conf.modules.d  logs  modules  run  state
+- cd conf.modules.d
+- vi 00-mpm.conf
+  #LoadModule mpm_prefork_module modules/mod_mpm_prefork.so
+   LoadModule mpm_worker_module modules/mod_mpm_worker.so
+
+- systemctl restart httpd
+
+2)
+- httpd -M | grep rewrite
+  rewrite_module (shared)
+
+3) 
+- sudo gedit /etc/httpd/conf/httpd.conf
+
+(a) RewriteEngine On
+
+- RewriteCond "%{QUERY_STRING}" "forbidden" [NC] 
+- RewriteRule "^/page$" "-" [F]
+
+
+- systemctl restart httpd
+
+
+(b)
+ - RewriteCond "%{QUERY_STRING}" "(.+)"
+ - RewriteRule ^ %{REQUEST_URI}?
+ 
+ 
+ - systemctl restart httpd
+ 
+ 
+ 
+(c)
+- RewriteCond "%{QUERY_STRING}" "val" 
+- RewriteRule "^/page1" "/page2" [R]
+
+
+- systemctl restart httpd
+
+
+(d)
+- RewriteCond "%{QUERY_STRING}" "var=val" 
+- RewriteRule "^/path" "^/path/var/val" [R]
+
+
+- systemctl restart httpd
+
+
+(e)
+- RewriteRule "^/example/(.+)/(.+)" "^/something.cgi?arg=$1&other=$2" [R]
+
+
+- systemctl restart httpd
+
+
+4)
+- sudo gedit /etc/httpd/conf/httpd.conf
+
+<VirtualHost *:80>
+    ServerName os.iti.gov.eg
+    DocumentRoot "/var/www/html/test"
+
+    <Directory "/var/www/html/test">
+        Options Indexes FollowSymLinks
+        AllowOverride All
+        Require all granted
+    </Directory>
+
+    RewriteEngine On
+    RewriteRule ^/(.*)$ /test/$1 [R]
+</VirtualHost>
+
+
+- systemctl restart httpd
